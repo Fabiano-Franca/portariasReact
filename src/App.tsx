@@ -38,6 +38,13 @@ function App() {
 
   }
 
+
+  function deletarAtividade(id: number) {
+    const atividadesFiltradas = atividades.filter(atividade => atividade.id !== id);
+
+    setAtividades([...atividadesFiltradas]);
+  }
+
   function prioridadeLabel(param: Number) {
     switch (param) {
       case 1:
@@ -54,16 +61,16 @@ function App() {
     }
   }
 
-  function prioridadeStyle(param: Number) {
+  function prioridadeStyle(param: Number, icone: boolean) {
     switch (param) {
       case 1:
-        return 'smile';
+        return icone ? 'smile' : 'success';
 
       case 2:
-        return 'meh';
+        return icone ? 'meh' : 'dark';
 
       case 3:
-        return 'frown';
+        return icone ? 'frown' : 'warning';
 
       default:
         return 'Nãod definido';
@@ -76,7 +83,17 @@ function App() {
 
         <div className='col-md-6'>
           <label htmlFor="id" className='form-label'>Id: </label>
-          <input id='id' type='text' className='form-control' placeholder='Id' />
+          <input id='id'
+            type='text'
+            className='form-control'
+            readOnly
+            value={
+              Math.max.apply(
+                Math,
+                atividades.map((item) => item.id)
+              ) + 1
+            }
+          />
         </div>
 
         <div className="col-md-6">
@@ -110,7 +127,7 @@ function App() {
       <div className="mt-3">
 
         {atividades.map(atv => (
-          <div key={atv.id} className='card mb-2 shadow-sm'>
+          <div key={atv.id} className={'card mb-2 shadow-sm border-' + prioridadeStyle(atv.prioridade, false)}>
             <div className='card-body'>
               <div className="d-flex justify-content-between">
                 <h5 className="card-title">
@@ -121,8 +138,8 @@ function App() {
                 </h5>
                 <h6>
                   Prioridade:
-                  <span className="ms-1 text-black">
-                    <i className={"me-1 fa-regular fa-face-" + prioridadeStyle(atv.prioridade)} />
+                  <span className={'ms-1 text-' + prioridadeStyle(atv.prioridade, false)}>
+                    <i className={"me-1 fa-regular fa-face-" + prioridadeStyle(atv.prioridade, true)} />
                     {prioridadeLabel(atv.prioridade)}
                   </span>
                 </h6>
@@ -135,7 +152,10 @@ function App() {
                   <i className="fas fa-pen me-2" />
                   Editar
                 </button>
-                <button className="btn btn-sm btn-outline-danger">
+                <button
+                  className='btn btn-sm btn-outline-danger'
+                  onClick={() => deletarAtividade(atv.id)}
+                >
                   <i className="fas fa-trash me-2" />
                   Deletar
                 </button>
