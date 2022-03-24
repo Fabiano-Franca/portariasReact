@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import AtividadeForm from './components/AtividadeForm';
 import AtividadeLista from './components/AtividadeLista';
@@ -10,26 +10,8 @@ type AtividadeT = {
   descricao: string
 }
 
-const initialState = [
-  {
-    id: 1,
-    prioridade: 3,
-    titulo: 'Verificar SCAE',
-    descricao: `Mandar e-mail para o DN questionando sobre a 
-    tratativa dos problemas descrito em e-mails anteriores.`
-  },
-  {
-    id: 2,
-    prioridade: 1,
-    titulo: 'Concluir os chamados pendentes',
-    descricao: `Verificar se os chamados com o status 
-    "Aguardando retorno" já foram respondidos para prosseguir 
-    com o atenndimento e concluir o chamado.`
-  },
-];
-
 const atv = {
-  id: 1,
+  id: 0,
   prioridade: 1,
   titulo: '',
   descricao: ''
@@ -37,24 +19,31 @@ const atv = {
 
 function App() {
 
-  const [atividades, setAtividades] = useState<AtividadeT[]>(initialState);
+  const [index, setIndex] = useState(0);
+  const [atividades, setAtividades] = useState<AtividadeT[]>([]);
   const [atividade, setAtividade] = useState<AtividadeT>(atv);
 
-  function addAtividade(e: any) {
-    e.preventDefault();
-
-    const atividade = {
-      id: Math.max.apply(
+  useEffect(() => {
+    atividades.length <= 0 ?
+      setIndex(1) :
+      setIndex(Math.max.apply(
         Math,
         atividades.map((item) => item.id)
-      ) + 1,
-      prioridade: Number((document.getElementById('prioridade') as HTMLInputElement).value),
-      titulo: (document.getElementById('titulo') as HTMLInputElement).value,
-      descricao: (document.getElementById('descricao') as HTMLInputElement).value
-    };
+      ) + 1
+      )
+  }, [atividades])
 
-    setAtividades([...atividades, { ...atividade }]);
+  function addAtividade(atv: AtividadeT) {
+    setAtividades([...atividades, { ...atv, id: index }]);
+  }
 
+  function atualizarAtividade(atv: AtividadeT) {
+    setAtividades(atividades.map(item => item.id === atv.id ? atv : item));
+    setAtividade(atv);
+  }
+
+  function cancelarAtividade() {
+    setAtividade(atv);
   }
 
   function deletarAtividade(id: number) {
@@ -72,7 +61,9 @@ function App() {
     <>
       <AtividadeForm
         addAtividade={addAtividade}
+        atualizarAtividade={atualizarAtividade}
         atividadeSelecionada={atividade}
+        cancelarAtividade={cancelarAtividade}
         atividades={atividades}
       />
       <AtividadeLista
