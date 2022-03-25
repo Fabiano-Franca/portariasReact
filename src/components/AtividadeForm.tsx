@@ -25,14 +25,23 @@ interface AtividadeFormProps {
     //Método sem retorno que recebe um parâmetro
     addAtividade: (e: any) => void;
 }
+/*
+const atividadeInicial = {
+    id: 0,
+    prioridade: 0,
+    titulo: '',
+    descricao: ''
+}
+*/
 
 export default function AtividadeForm({ atividades, atividadeSelecionada, addAtividade }: AtividadeFormProps) {
 
     const [atividade, setAtividade] = useState<Atividade>(atividadeSelecionada);
 
     useEffect(() => {
-        console.log('Executou o hook useEffect');
-    }, [atividade]);
+        if (atividadeSelecionada.id !== 0)
+            setAtividade(atividadeSelecionada);
+    }, [atividadeSelecionada]);
 
     function inputTextHandler(e: any) {
         let { name, value } = e.target;
@@ -47,6 +56,15 @@ export default function AtividadeForm({ atividades, atividadeSelecionada, addAti
         setAtividade({ ...atividade, [name]: value });
     }
 
+    /*
+        function atividadeAtual() {
+            if (atividadeSelecionada.id !== 0) {
+                return atividadeSelecionada;
+            } else {
+                return atividadeInicial;
+            }
+        }
+    */
     return (
         <form className='row g-3'>
 
